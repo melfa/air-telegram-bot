@@ -8,6 +8,8 @@ use React\Http\Request;
 use React\Http\Response;
 use Phroute\Phroute\Dispatcher;
 
+define('TELEGRAM_API_TOKEN', 'x:y');
+
 require('../vendor/autoload.php');
 $router = require('routes.php');
 $dispatcher = new Dispatcher($router->getData());

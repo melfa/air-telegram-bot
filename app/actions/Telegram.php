@@ -11,7 +11,7 @@ class Telegram extends Action
 
     public function run()
     {
-        $telegram = new Api('149083827:AAFPrapXL65wWplM6NJKda36wcBid9ivZho', true);
+        $telegram = new Api(TELEGRAM_API_TOKEN, true);
         $telegram->addCommand(StartCommand::class);
         $telegram->addCommand(AirCommand::class);
 
