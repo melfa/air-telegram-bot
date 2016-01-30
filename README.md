@@ -18,8 +18,9 @@ Ngrok is https forwarding service. Needed for telegram bot API webhook since tel
 # Setup php service
 
 * install composer globally
+* cd air-telegram-bot
 * `composer install`
 * copy config.json to config.local.json and setup telegram bot API key (get from https://core.telegram.org/bots/api)
 and ngrok host (from ngrok running console).
-* `cd app && nohup php app.php > app.log`
+* `nohup php app/app.php > app.log`
 * setup telegram https webhook using ngrok: `curl -v https://<your_subdomain>.ngrok.io/air/setup`
