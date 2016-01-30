@@ -1,35 +1,34 @@
 <?php
 namespace air\app;
 
-use React\Filesystem\Filesystem;
+use Clue\React\Redis\Client;
+use Clue\React\Redis\Factory;
 
 class Storage
 {
-    /** @var Filesystem */
-    protected $filesystem;
-    /** @var string */
-    protected $storageFilePath;
     /** @var array */
-    protected $measures;
+    protected $measures = [];
+    /** @var Factory */
+    protected $redis;
+    /** @var string */
+    protected $redisConnectString;
 
-    public function __construct($filesystem, $storageFilePath)
+    public function __construct(Factory $redis, $redisConnectString)
     {
-        $this->filesystem = $filesystem;
-        $this->storageFilePath = $storageFilePath;
+        $this->redis = $redis;
+        $this->redisConnectString = $redisConnectString;
 
-        $this->filesystem->getContents($this->storageFilePath)->then(function($contents) {
-            if (!$contents) {
-                return;
+        $redis->createClient($this->redisConnectString)->then(
+            function (Client $client) {
+                $client->get('measures')->then(function ($measures) {
+                    if ($measures) {
+                        $this->measures = json_decode($measures, true);
+                    }
+
+                });
+                $client->end();
             }
-
-            $measures = json_decode($contents, true);
-            if (!$measures) {
-                $this->measures = [];
-                return;
-            }
-
-            $this->measures = $measures;
-        });
+        );
     }
 
     public function getCo2Ppm()
@@ -38,15 +37,19 @@ class Storage
             return null;
         }
 
-        return $this->measures[count($this->measures) - 1];
+        return $this->measures[count($this->measures) - 1]['co2ppm'];
     }
 
     public function setCo2Ppm($ppm)
     {
         $this->measures[] = ['co2ppm' => $ppm, 'time' => time()];
-        $this->filesystem->file($this->storageFilePath)->open('cwt')->then(function($stream) {
-            $stream->end(json_encode($this->measures));
-        });
+
+        $this->redis->createClient($this->redisConnectString)->then(
+            function (Client $client) {
+                $client->set('measures', json_encode($this->measures));
+                $client->end();
+            }
+        );
     }
 
 }

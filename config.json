@@ -1,5 +1,5 @@
 {
-  "runtimePath": "runtime",
+  "redis": "localhost:6379/1",
   "telegram": {
     "apiToken": "x:y",
     "webhookHost": "qwe123.ngrok.io"

@@ -3,7 +3,7 @@
         "react/react": "0.4.2",
         "irazasyed/telegram-bot-sdk": "2.0.0",
         "phroute/phroute": "2.1.0",
-        "react/filesystem": "dev-master#454a423930c698ab51ec6e0b036011c8356192fa"
+        "clue/redis-react": "0.5.1"
     },
     "autoload": {
         "psr-4": {"air\\": ""}

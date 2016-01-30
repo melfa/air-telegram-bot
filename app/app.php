@@ -6,7 +6,6 @@ use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use React\EventLoop\Factory;
 use React\Http\Request;
 use React\Http\Response;
-use React\Filesystem\Filesystem;
 use Phroute\Phroute\Dispatcher;
 use Phroute\Phroute\RouteCollector;
 use Telegram\Bot\Api;
@@ -33,14 +32,13 @@ class App
     {
         $this->loop = Factory::create();
         $this->socket = new \React\Socket\Server($this->loop);
-        $this->filesystem = Filesystem::create(Factory::create());
+        $redis = new \Clue\React\Redis\Factory($this->loop);
 
         $config = $this->getConfig();
-        $runtimePath = __DIR__ . '/' . $config->runtimePath;
 
         $this->resolver = new DIContainer;
         $this->resolver->config = $config;
-        $this->resolver->storage = new Storage($this->filesystem, $runtimePath . '/storage.json');
+        $this->resolver->storage = new Storage($redis, $config->redis);
         $this->resolver->telegram = new Api($config->telegram->apiToken, true);
         $this->resolver->telegram->addCommand(new StartCommand($this->resolver->storage));
         $this->resolver->telegram->addCommand(new AirCommand($this->resolver->storage));
