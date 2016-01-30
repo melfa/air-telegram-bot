@@ -1,3 +1,7 @@
 {
-  "telegram-api-token": "x:y"
+  "runtimePath": "runtime",
+  "telegram": {
+    "apiToken": "x:y",
+    "webhookHost": "qwe123.ngrok.io"
+  }
 }

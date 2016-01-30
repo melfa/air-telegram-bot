@@ -9,7 +9,7 @@ use Telegram\Bot\Objects\Update;
 class Telegram extends Action
 {
 
-    public function run()
+    public function action()
     {
         $telegram = new Api(TELEGRAM_API_TOKEN, true);
         $telegram->addCommand(StartCommand::class);

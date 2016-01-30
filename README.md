@@ -2,6 +2,9 @@ CO2 detector (Masterkit MT8057) telegram bot
 
 # Setup php service
 
+* `apt-get install php5-cli php5-dev php-pear`
+* `pecl install eio` this is required by react/filesystem
+* put `extension=eio.so` in /etc/php5/cli/conf.d/20-eio.ini
 * install composer globally
 * `composer install`
 * `apt-get install php5-cli`
