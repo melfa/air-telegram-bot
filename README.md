@@ -2,16 +2,32 @@ CO2 detector (Masterkit MT8057) telegram bot.
 * Language is PHP
 * Framework is reactphp
 * Measurements storage is InfluxDB
+* Bot command provided:
+```
+You: /start
+Bot: /air Show CO2 ppm in office
+You: /air
+Bot: fresh (500 ppm)
+```
 
 # Requirements
 ## Hardware
 
-* CO2 detector
+* CO2 detector Masterkit MT8057
 
-## Software
+## System
 
 * `apt-get install php5-cli redis-server`
+
+## Library
+
 * [Ambient7 agent (java)](https://github.com/maizy/ambient7)
+
+## Services
+
+* Telegram bot API key (get from https://core.telegram.org/bots/api)
+* ngrok https forwarding https://ngrok.com
+
 
 # Setup agent
 * Download ambient7 library jar from https://github.com/maizy/ambient7
@@ -33,10 +49,10 @@ Ngrok is https forwarding service. Needed for telegram bot API webhook since tel
 # Setup php service
 
 * install composer globally
-* cd air-telegram-bot
+* `cd air-telegram-bot`
 * `composer install`
 * copy config.json to config.local.json and setup:
-  * telegram > apiToken - telegram bot API key (get from https://core.telegram.org/bots/api)
+  * telegram > apiToken - telegram bot API key
   * telegram > webhookHost - ngrok host (from ngrok running console)
   * influx > password - InfluxDB air user password
 * `nohup php app/app.php > app.log`
