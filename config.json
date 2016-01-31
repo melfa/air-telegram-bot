@@ -1,5 +1,14 @@
 {
-  "redis": "localhost:6379/1",
+  "listen": {
+    "host": "0.0.0.0",
+    "port": 18062
+  },
+  "influx": {
+    "host": "127.0.0.1",
+    "port": "8086",
+    "user": "air",
+    "password": ""
+  },
   "telegram": {
     "apiToken": "x:y",
     "webhookHost": "qwe123.ngrok.io"

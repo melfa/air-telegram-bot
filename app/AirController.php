@@ -15,11 +15,6 @@ class AirController
         $this->resolver = $resolver;
     }
 
-    public function getSet($ppm)
-    {
-        $this->resolver->storage->setCo2Ppm($ppm);
-    }
-
     public function getSetup()
     {
         $host = $this->resolver->config->telegram->webhookHost;

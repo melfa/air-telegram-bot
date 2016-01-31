@@ -3,7 +3,8 @@
         "react/react": "0.4.2",
         "irazasyed/telegram-bot-sdk": "2.0.0",
         "phroute/phroute": "2.1.0",
-        "clue/redis-react": "0.5.1"
+        "guzzlehttp/guzzle": "6.1.1",
+        "wyrihaximus/react-guzzle-psr7": "1.0.0"
     },
     "autoload": {
         "psr-4": {"air\\": ""}

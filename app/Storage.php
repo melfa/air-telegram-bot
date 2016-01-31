@@ -1,53 +1,92 @@
 <?php
 namespace air\app;
 
-use Clue\React\Redis\Client;
-use Clue\React\Redis\Factory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
+use React\EventLoop\LoopInterface;
+use WyriHaximus\React\GuzzlePsr7\HttpClientAdapter;
 
 class Storage
 {
-    /** @var array */
-    protected $measures = [];
-    /** @var Factory */
-    protected $redis;
-    /** @var string */
-    protected $redisConnectString;
+    /** @var Client */
+    protected $http;
+    /** @var \stdClass */
+    protected $influxConfig;
 
-    public function __construct(Factory $redis, $redisConnectString)
+    public function __construct(LoopInterface $loop, $influxConfig)
     {
-        $this->redis = $redis;
-        $this->redisConnectString = $redisConnectString;
+        $this->influxConfig = $influxConfig;
 
-        $redis->createClient($this->redisConnectString)->then(
-            function (Client $client) {
-                $client->get('measures')->then(function ($measures) {
-                    if ($measures) {
-                        $this->measures = json_decode($measures, true);
-                    }
+        $handler = new HttpClientAdapter($loop);
 
-                });
-                $client->end();
-            }
-        );
+        $this->http = new Client([
+            'handler' => HandlerStack::create($handler),
+            'base_uri' => "http://{$influxConfig->host}:{$influxConfig->port}/"
+        ]);
     }
 
+    /**
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
     public function getCo2Ppm()
     {
-        if (!$this->measures) {
-            return null;
-        }
+        return $this->http->getAsync('query', [
+            RequestOptions::AUTH => [$this->influxConfig->user, $this->influxConfig->password],
+            RequestOptions::QUERY => [
+                'db' => 'air',
+                'q' => 'select value from co2 GROUP BY * ORDER BY time DESC limit 1',   // get last value from co2
+                'epoch' => 's', // timestamps in seconds
+            ],
+        ])->then(
+            function (ResponseInterface $response) {
+                $influxResponse = json_decode($response->getBody(), true);
 
-        return $this->measures[count($this->measures) - 1]['co2ppm'];
-    }
+                /*
+                    {
+                        "results": [
+                            {
+                                "series": [
+                                    {
+                                        "name": "cpu_load_short",
+                                        "columns": [
+                                            "time",
+                                            "value"
+                                        ],
+                                        "values": [
+                                            [
+                                                "2015-01-29T21:55:43.702900257Z",
+                                                0.55
+                                            ],
+                                            [
+                                                "2015-01-29T21:55:43.702900257Z",
+                                                23422
+                                            ],
+                                            [
+                                                "2015-06-11T20:46:02Z",
+                                                0.64
+                                            ]
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                 */
 
-    public function setCo2Ppm($ppm)
-    {
-        $this->measures[] = ['co2ppm' => $ppm, 'time' => time()];
+                if (!$influxResponse || !is_array($influxResponse)) {
+                    return null;
+                }
 
-        $this->redis->createClient($this->redisConnectString)->then(
-            function (Client $client) {
-                $client->set('measures', json_encode($this->measures));
-                $client->end();
+                return $influxResponse['results'][0]['series'][0]['values'][0][1];
+            },
+            function ($e) {
+                // todo logging
+                var_dump($e->getMessage());
+//                echo $e->getMessage() . "\n";
+//                echo $e->getRequest()->getMethod();
             }
         );
     }

@@ -16,8 +16,6 @@ require(__DIR__ . '/../vendor/autoload.php');
 
 class App
 {
-    const LISTEN_HOST = '0.0.0.0';
-    const LISTEN_PORT = 18062;
 
     /** @var \React\Socket\Server */
     protected $socket;
@@ -27,19 +25,20 @@ class App
     protected $dispatcher;
     /** @var DIContainer */
     protected $resolver;
+    /** @var \stdClass */
+    protected $config;
 
     public function __construct()
     {
         $this->loop = Factory::create();
         $this->socket = new \React\Socket\Server($this->loop);
-        $redis = new \Clue\React\Redis\Factory($this->loop);
 
-        $config = $this->getConfig();
+        $this->config = $this->readConfig();
 
         $this->resolver = new DIContainer;
-        $this->resolver->config = $config;
-        $this->resolver->storage = new Storage($redis, $config->redis);
-        $this->resolver->telegram = new Api($config->telegram->apiToken, true);
+        $this->resolver->config = $this->config;
+        $this->resolver->storage = new Storage($this->loop, $this->config->influx);
+        $this->resolver->telegram = new Api($this->config->telegram->apiToken, true);
         $this->resolver->telegram->addCommand(new StartCommand($this->resolver->storage));
         $this->resolver->telegram->addCommand(new AirCommand($this->resolver->storage));
 
@@ -58,7 +57,7 @@ class App
             ->controller('/air', 'air\app\AirController');
     }
 
-    protected function getConfig()
+    protected function readConfig()
     {
         $configFileName = file_exists(__DIR__ . '/../config.local.json') ?
             __DIR__ . '/../config.local.json' : __DIR__ . '/../config.json';
@@ -67,7 +66,7 @@ class App
 
     public function run()
     {
-        $this->socket->listen(self::LISTEN_PORT, self::LISTEN_HOST);
+        $this->socket->listen($this->config->listen->port, $this->config->listen->host);
         $this->loop->run();
     }
 
