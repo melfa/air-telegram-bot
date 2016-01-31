@@ -16,9 +16,9 @@ CO2 detector (Masterkit MT8057) telegram bot.
 # Setup agent
 * Download ambient7 library jar from https://github.com/maizy/ambient7
 * Install InfluxDB https://docs.influxdata.com/influxdb/, setup "air" database, "air" user
-* Run ```java -jar ambient7-mt8057-agent-x.x.x.jar --writers influxdb \
-      --influxdb-database air \
-      --influxdb-baseurl http://localhost:8086/write \
+* Run ```java -jar ambient7-mt8057-agent-x.x.x.jar --writers influxdb
+      --influxdb-database air
+      --influxdb-baseurl http://localhost:8086/write
       --influxdb-user air --influxdb-password 123qwe```
 
 # Setup ngrok
