@@ -34,7 +34,7 @@ Bot: Fresh (500 ppm)
 * Install InfluxDB https://docs.influxdata.com/influxdb/, setup "air" database, "air" user
 * Run ```java -jar ambient7-mt8057-agent-x.x.x.jar --writers influxdb
       --influxdb-database air
-      --influxdb-baseurl http://localhost:8086/write
+      --influxdb-baseurl http://host_where_telegram_bot_is_running:8086/write
       --influxdb-user air --influxdb-password 123qwe```
 
 # Setup ngrok
