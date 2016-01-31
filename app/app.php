@@ -11,6 +11,10 @@ use Phroute\Phroute\RouteCollector;
 use Telegram\Bot\Api;
 use air\app\telegram\AirCommand;
 use air\app\telegram\StartCommand;
+use Telegram\Bot\HttpClients\GuzzleHttpClient;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use WyriHaximus\React\GuzzlePsr7\HttpClientAdapter;
 
 require(__DIR__ . '/../vendor/autoload.php');
 
@@ -37,8 +41,16 @@ class App
 
         $this->resolver = new DIContainer;
         $this->resolver->config = $this->config;
+
         $this->resolver->storage = new Storage($this->loop, $this->config->influx);
-        $this->resolver->telegram = new Api($this->config->telegram->apiToken, true);
+
+        $this->resolver->telegram = new Api(
+            $this->config->telegram->apiToken,
+            true,
+            new GuzzleHttpClient(new Client([
+                'handler' => HandlerStack::create(new HttpClientAdapter($this->loop)),
+            ]))
+        );
         $this->resolver->telegram->addCommand(new StartCommand($this->resolver->storage));
         $this->resolver->telegram->addCommand(new AirCommand($this->resolver->storage));
 

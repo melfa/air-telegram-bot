@@ -2,7 +2,6 @@
 namespace air\app;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
@@ -20,10 +19,8 @@ class Storage
     {
         $this->influxConfig = $influxConfig;
 
-        $handler = new HttpClientAdapter($loop);
-
         $this->http = new Client([
-            'handler' => HandlerStack::create($handler),
+            'handler' => HandlerStack::create(new HttpClientAdapter($loop)),
             'base_uri' => "http://{$influxConfig->host}:{$influxConfig->port}/"
         ]);
     }
