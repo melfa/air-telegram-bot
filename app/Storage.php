@@ -34,7 +34,7 @@ class Storage
             RequestOptions::AUTH => [$this->influxConfig->user, $this->influxConfig->password],
             RequestOptions::QUERY => [
                 'db' => 'air',
-                'q' => 'select value from co2 GROUP BY * ORDER BY time DESC limit 1',   // get last value from co2
+                'q' => 'select ppm from co2 GROUP BY * ORDER BY time DESC limit 1',   // get last value from co2
                 'epoch' => 's', // timestamps in seconds
             ],
         ])->then(
@@ -50,7 +50,7 @@ class Storage
                                         "name": "cpu_load_short",
                                         "columns": [
                                             "time",
-                                            "value"
+                                            "ppm"
                                         ],
                                         "values": [
                                             [
