@@ -21,8 +21,10 @@ class AirCommand extends Command
 
     public function handle($arguments)
     {
-        $this->storage->getCo2PpmLast()->then(function ($co2ppm) {
-            $this->replyWithMessage(['text' => (new Formatter)->formatCo2Ppm($co2ppm)]);
+        $this->storage->getCo2Ppm()->then(function ($co2value) {
+            $this->replyWithMessage([
+                'text' => (new Formatter)->formatCo2Ppm($co2value->ppm)
+            ]);
         });
     }
 

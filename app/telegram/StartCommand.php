@@ -13,7 +13,9 @@ class StartCommand extends Command
     public function handle($arguments)
     {
         $this->replyWithMessage([
-            'text' => "/air Show CO2 ppm in office\n/watch Subscribe to alerts on air evaluation changed",
+            'text' => "/air Show CO2 ppm in office\n"
+                . "/watch Subscribe to alerts on air evaluation changed\n"
+                . "/mute Mute alerts",
         ]);
     }
 

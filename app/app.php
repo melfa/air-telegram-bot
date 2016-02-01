@@ -5,6 +5,7 @@ use air\app\controllers\AirController;
 use air\app\core\DIContainer;
 use air\app\core\Storage;
 use air\app\core\Watcher;
+use air\app\telegram\MuteCommand;
 use air\app\telegram\WatchCommand;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
@@ -65,6 +66,7 @@ class App
         $this->resolver->telegram->addCommand(new StartCommand);
         $this->resolver->telegram->addCommand(new AirCommand($this->resolver->storage));
         $this->resolver->telegram->addCommand(new WatchCommand($this->watcher));
+        $this->resolver->telegram->addCommand(new MuteCommand($this->watcher));
 
         $this->dispatcher = new Dispatcher($this->routes()->getData(), $this->resolver);
 
