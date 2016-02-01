@@ -6,6 +6,8 @@ CO2 detector (Masterkit MT8057) telegram bot.
 ```
 You: /start
 Bot: /air Show CO2 ppm in office
+     /watch Subscribe to alerts on air evaluation changed
+     /mute Mute alerts
 You: /air
 Bot: Fresh (500 ppm)
 ```
