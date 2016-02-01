@@ -1,6 +1,8 @@
 <?php
-namespace air\app;
+namespace air\app\core;
 
+use air\app\controllers\AirController;
+use air\app\core\Storage;
 use Phroute\Phroute\HandlerResolverInterface;
 use React\Http\Request;
 use React\Http\Response;
@@ -26,7 +28,7 @@ class DIContainer implements HandlerResolverInterface
          *
          *      $handler = ['App\Controllers\Home', 'method'];
          */
-        if (is_array($handler) && is_string($handler[0]) && 'air\app\AirController' == $handler[0]) {
+        if (is_array($handler) && is_string($handler[0]) && AirController::class == $handler[0]) {
             $handler[0] = new AirController($this);
         }
 

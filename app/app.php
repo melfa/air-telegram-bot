@@ -1,6 +1,11 @@
 <?php
 namespace air\app;
 
+use air\app\controllers\AirController;
+use air\app\core\DIContainer;
+use air\app\core\Storage;
+use air\app\core\Watcher;
+use air\app\telegram\WatchCommand;
 use Phroute\Phroute\Exception\HttpMethodNotAllowedException;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
 use React\EventLoop\Factory;
@@ -31,6 +36,7 @@ class App
     protected $resolver;
     /** @var \stdClass */
     protected $config;
+    protected $watcher;
 
     public function __construct()
     {
@@ -44,6 +50,11 @@ class App
 
         $this->resolver->storage = new Storage($this->loop, $this->config->influx);
 
+        $this->watcher = new Watcher($this->resolver);
+        $this->loop->addPeriodicTimer(Watcher::CHECK_INTERVAL, function() {
+            $this->watcher->watch();
+        });
+
         $this->resolver->telegram = new Api(
             $this->config->telegram->apiToken,
             true,
@@ -51,8 +62,9 @@ class App
                 'handler' => HandlerStack::create(new HttpClientAdapter($this->loop)),
             ]))
         );
-        $this->resolver->telegram->addCommand(new StartCommand($this->resolver->storage));
+        $this->resolver->telegram->addCommand(new StartCommand);
         $this->resolver->telegram->addCommand(new AirCommand($this->resolver->storage));
+        $this->resolver->telegram->addCommand(new WatchCommand($this->watcher));
 
         $this->dispatcher = new Dispatcher($this->routes()->getData(), $this->resolver);
 
@@ -66,7 +78,7 @@ class App
     protected function routes()
     {
         return (new RouteCollector)
-            ->controller('/air', 'air\app\AirController');
+            ->controller('/air', AirController::class);
     }
 
     protected function readConfig()

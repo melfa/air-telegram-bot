@@ -1,5 +1,5 @@
 <?php
-namespace air\app;
+namespace air\app\core;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -26,16 +26,17 @@ class Storage
     }
 
     /**
+     * Get current CO2 value
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getCo2Ppm()
+    public function getCo2PpmLast()
     {
         return $this->http->getAsync('query', [
             RequestOptions::AUTH => [$this->influxConfig->user, $this->influxConfig->password],
             RequestOptions::QUERY => [
                 'db' => 'air',
-                'q' => 'select ppm from co2 GROUP BY * ORDER BY time DESC limit 1',   // get last value from co2
-                'epoch' => 's', // timestamps in seconds
+                'q' => 'select last(ppm) from co2',
+//                'epoch' => 's', // timestamps in seconds
             ],
         ])->then(
             function (ResponseInterface $response) {
@@ -79,7 +80,73 @@ class Storage
 
                 return $influxResponse['results'][0]['series'][0]['values'][0][1];
             },
-            function ($e) {
+            function (\Exception $e) {
+                // todo logging
+                var_dump($e->getMessage());
+//                echo $e->getMessage() . "\n";
+//                echo $e->getRequest()->getMethod();
+            }
+        );
+    }
+
+    /**
+     * Get last $count values
+     *
+     * @param int $count
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function getCo2PpmList($count)
+    {
+        return $this->http->getAsync('query', [
+            RequestOptions::AUTH => [$this->influxConfig->user, $this->influxConfig->password],
+            RequestOptions::QUERY => [
+                'db' => 'air',
+                'q' => 'select last(ppm) from co2',
+//                'epoch' => 's', // timestamps in seconds
+            ],
+        ])->then(
+            function (ResponseInterface $response) {
+                $influxResponse = json_decode($response->getBody(), true);
+
+                /*
+                    {
+                        "results": [
+                            {
+                                "series": [
+                                    {
+                                        "name": "cpu_load_short",
+                                        "columns": [
+                                            "time",
+                                            "ppm"
+                                        ],
+                                        "values": [
+                                            [
+                                                "2015-01-29T21:55:43.702900257Z",
+                                                0.55
+                                            ],
+                                            [
+                                                "2015-01-29T21:55:43.702900257Z",
+                                                23422
+                                            ],
+                                            [
+                                                "2015-06-11T20:46:02Z",
+                                                0.64
+                                            ]
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                 */
+
+                if (!$influxResponse || !is_array($influxResponse)) {
+                    return null;
+                }
+
+                return $influxResponse['results'][0]['series'][0]['values'][0][1];
+            },
+            function (\Exception $e) {
                 // todo logging
                 var_dump($e->getMessage());
 //                echo $e->getMessage() . "\n";

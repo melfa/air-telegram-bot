@@ -1,8 +1,8 @@
 <?php
-namespace air\app;
+namespace air\app\controllers;
 
+use air\app\core\DIContainer;
 use React\Stream\BufferedSink;
-use Telegram\Bot\Api;
 use Telegram\Bot\Objects\Update;
 
 class AirController
