@@ -24,6 +24,8 @@ use WyriHaximus\React\GuzzlePsr7\HttpClientAdapter;
 
 require(__DIR__ . '/../vendor/autoload.php');
 
+define('APP_DEBUG', false);
+
 class App
 {
 

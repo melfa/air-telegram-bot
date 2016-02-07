@@ -54,7 +54,9 @@ class Watcher
                 return;
             }
 
-            echo "state {$this->state} current {$co2value->ppm}:{$co2value->time} prev {$this->co2prev->ppm}:{$this->co2prev->time}" . PHP_EOL;
+            if (defined('APP_DEBUG') && APP_DEBUG) {
+                echo "state {$this->state} current {$co2value->ppm}:{$co2value->time} prev {$this->co2prev->ppm}:{$this->co2prev->time}" . PHP_EOL;
+            }
 
             switch ($this->state) {
                 case self::STATE_NAP:
@@ -94,8 +96,11 @@ class Watcher
             return;
         }
 
+        // todo persistence
         $this->subscribers[] = $chatId;
-        echo "$chatId subscribed" . PHP_EOL;
+        if (defined('APP_DEBUG') && APP_DEBUG) {
+            echo "$chatId subscribed" . PHP_EOL;
+        }
     }
 
     /**
@@ -105,7 +110,9 @@ class Watcher
     public function unsubscribe($chatId)
     {
         $this->subscribers = array_diff($this->subscribers, [$chatId]);
-        echo "$chatId unsubscribed" . PHP_EOL;
+        if (defined('APP_DEBUG') && APP_DEBUG) {
+            echo "$chatId unsubscribed" . PHP_EOL;
+        }
     }
 
     protected function getIndex($co2ppm)
@@ -126,11 +133,15 @@ class Watcher
     {
         if ($this->notifyCount > 50) {
             // spam prevention
-            echo "Spam prevented" . PHP_EOL;
+            if (defined('APP_DEBUG') && APP_DEBUG) {
+                echo "Spam prevented" . PHP_EOL;
+            }
             return;
         }
 
-        echo "Notify" . PHP_EOL;
+        if (defined('APP_DEBUG') && APP_DEBUG) {
+            echo "Notify" . PHP_EOL;
+        }
 
         foreach ($this->subscribers as $chatId) {
             $this->resolver->telegram->sendMessage([

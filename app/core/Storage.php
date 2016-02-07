@@ -87,7 +87,6 @@ class Storage
             function (\Exception $e) {
                 // todo logging
                 var_dump($e->getMessage());
-//                echo $e->getMessage() . "\n";
 //                echo $e->getRequest()->getMethod();
             }
         );
